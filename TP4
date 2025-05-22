@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Détection de mot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .mot {
+      color: blue;
+      cursor: pointer;
+      margin: 5px;
+      display: inline-block;
+    }
+    #message {
+      margin-top: 20px;
+      font-weight: bold;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <h2>Clique sur un mot :</h2>
+  <div id="mots">
+    <!-- Les mots seront ajoutés ici -->
+  </div>
+
+  <div id="message"></div>
+
+  <script>
+    const listeMots = ["Chat", "Chien", "Pomme", "Voiture", "Lune"];
+    const conteneur = document.getElementById("mots");
+    const message = document.getElementById("message");
+
+    listeMots.forEach(mot => {
+      const span = document.createElement("span");
+      span.innerText = mot;
+      span.classList.add("mot");
+      span.onclick = () => {
+        message.innerText = Le mot "${mot}" est détecté.;
+      };
+      conteneur.appendChild(span);
+    });
+  </script>
+</body>
+</html>
