@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Interactif</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin: 10px 0;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .question-container {
+            display: none;
+            text-align: left;
+        }
+
+        .question {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .options {
+            margin-bottom: 20px;
+        }
+
+        .option {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .option:hover {
+            background-color: #d6eaf8;
+        }
+
+        .result {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #e8f8f5;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        .progress {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .file-path {
+            font-family: monospace;
+            background-color: #f0f0f0;
+            padding: 5px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+
+        .good {
+            background-color: #d5f5e3;
+            color: #2e7d32;
+        }
+
+        .average {
+            background-color: #fff8e1;
+            color: #ff8f00;
+        }
+
+        .bad {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Quiz Interactif</h1>
+        
+        <div id="start-screen">
+            <p class="file-path">Fichier D:/%3D%3DMyFiles%3D%3D/Cour...</p>
+            <p>Cette page indique</p>
+            <button id="start-btn" class="btn">Démarrer le Quiz</button>
+        </div>
+        
+        <div id="quiz-screen" class="question-container">
+            <div class="question" id="question-text"></div>
+            <div class="options" id="options-container"></div>
+            <button id="next-btn" class="btn" style="display: none;">OK</button>
+            <div class="progress" id="progress"></div>
+        </div>
+        
+        <div id="result-screen" class="question-container">
+            <p class="file-path">Fichier D:/%3D%3DMyFiles%3D%3D/Cour...</p>
+            <p>Cette page indique</p>
+            <div class="result" id="result-text"></div>
+            <button id="restart-btn" class="btn">Démarrer</button>
+            <button id="ok-btn" class="btn">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // Questions pour le quiz
+        const questions = [
+            {
+                question: "Quelle est la capitale de la France?",
+                options: ["Londres", "Berlin", "Paris", "Madrid"],
+                correctAnswer: 2
+            },
+            {
+                question: "Quel langage s'exécute dans un navigateur web?",
+                options: ["Java", "C", "Python", "JavaScript"],
+                correctAnswer: 3
+            },
+            {
+                question: "Quel symbole représente l'euro?",
+                options: ["$", "£", "¥", "€"],
+                correctAnswer: 3
+            }
+        ];
+
+        // Éléments du DOM
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const nextBtn = document.getElementById('next-btn');
+        const progressText = document.getElementById('progress');
+        const resultText = document.getElementById('result-text');
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const okBtn = document.getElementById('ok-btn');
+
+        // Variables d'état
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedOption = null;
+
+        // Démarrer le quiz
+        startBtn.addEventListener('click', startQuiz);
+        restartBtn.addEventListener('click', startQuiz);
+
+        function startQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            startScreen.style.display = 'none';
+            resultScreen.style.display = 'none';
+            quizScreen.style.display = 'block';
+            showQuestion();
+        }
+
+        // Afficher la question
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            questionText.textContent = question.question;
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.classList.add('option');
+                optionElement.textContent = option;
+                optionElement.addEventListener('click', () => selectOption(index));
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            nextBtn.style.display = 'none';
+            progressText.textContent = `Question ${currentQuestion + 1} sur ${questions.length}`;
+        }
+
+        // Sélectionner une option
+        function selectOption(index) {
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.style.backgroundColor = '#ecf0f1';
+            });
+            
+            options[index].style.backgroundColor = '#d6eaf8';
+            selectedOption = index;
+            nextBtn.style.display = 'block';
+        }
+
+        // Passer à la question suivante
+        nextBtn.addEventListener('click', nextQuestion);
+
+        function nextQuestion() {
+            if (selectedOption === questions[currentQuestion].correctAnswer) {
+                score++;
+            }
+            
+            currentQuestion++;
+            
+            if (currentQuestion < questions.length) {
+                selectedOption = null;
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        // Afficher le résultat (version améliorée)
+        function showResult() {
+            quizScreen.style.display = 'none';
+            resultScreen.style.display = 'block';
+            
+            const totalQuestions = questions.length;
+            const mistakes = totalQuestions - score;
+            
+            // Reset classes
+            resultText.className = 'result';
+            
+            if (score === totalQuestions) {
+                resultText.textContent = "Réponse juste";
+                resultText.classList.add('good');
+            } else {
+                resultText.textContent = `Vous avez répondu correctement à ${score} questions sur ${totalQuestions}.\nVous avez fait ${mistakes} faute${mistakes > 1 ? 's' : ''}.`;
+                
+                // Ajout de classes en fonction du score
+                if (score >= totalQuestions * 0.7) {
+                    resultText.classList.add('average');
+                } else {
+                    resultText.classList.add('bad');
+                }
+            }
+        }
+
+        // Bouton OK pour revenir au début
+        okBtn.addEventListener('click', () => {
+            resultScreen.style.display = 'none';
+            startScreen.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
